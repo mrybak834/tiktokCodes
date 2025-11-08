@@ -9,13 +9,16 @@
   </head>
   <body>
     <main class="game-shell">
-      <canvas id="game-canvas" role="img" aria-label="2D game world"></canvas>
-      <aside class="hud" aria-live="polite">
-        <h1 class="hud__title">Canvas Runner</h1>
-        <p class="hud__hint">Use the arrow keys to move the player.</p>
-        <button
-          class="hud__autopilot"
-          type="button"
+      <div class="game-shell__play">
+        <canvas id="game-canvas" role="img" aria-label="2D game world"></canvas>
+      </div>
+      <div class="hud-shell">
+        <aside class="hud" aria-live="polite">
+          <h1 class="hud__title">Canvas Runner</h1>
+          <p class="hud__hint">Use the arrow keys to move the player.</p>
+          <button
+            class="hud__autopilot"
+            type="button"
           aria-pressed="false"
           aria-label="Enable autopilot"
         >
@@ -48,7 +51,8 @@
             </span>
           </li>
         </ul>
-      </aside>
+        </aside>
+      </div>
     </main>
   </body>
 </html>
