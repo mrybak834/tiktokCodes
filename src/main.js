@@ -150,13 +150,6 @@ const updateAutopilot = (delta) => {
   applyAutopilotStep();
 };
 
-const handleKeyChange = (event, isActive) => {
-  if (!Object.prototype.hasOwnProperty.call(gameState.keys, event.key)) {
-    return;
-  }
-
-  if (gameState.autopilot.enabled) {
-    setAutopilotEnabled(false);
 const updateKeyDisplay = () => {
   Object.entries(gameState.keys).forEach(([key, isActive]) => {
     const element = keyElements[key];
@@ -167,13 +160,16 @@ const updateKeyDisplay = () => {
 };
 
 const handleKeyChange = (event, isActive) => {
-  if (Object.prototype.hasOwnProperty.call(gameState.keys, event.key)) {
-    gameState.keys[event.key] = isActive;
-    updateKeyDisplay();
-    event.preventDefault();
+  if (!Object.prototype.hasOwnProperty.call(gameState.keys, event.key)) {
+    return;
+  }
+
+  if (gameState.autopilot.enabled) {
+    setAutopilotEnabled(false);
   }
 
   gameState.keys[event.key] = isActive;
+  updateKeyDisplay();
   event.preventDefault();
 };
 
