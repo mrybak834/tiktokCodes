@@ -18,6 +18,17 @@ const gameState = {
     ArrowLeft: false,
     ArrowRight: false,
   },
+  autopilot: {
+    enabled: false,
+    elapsed: 0,
+    index: 0,
+    sequence: [
+      { keys: ['ArrowRight'], duration: 1.2 },
+      { keys: ['ArrowDown'], duration: 1.2 },
+      { keys: ['ArrowLeft'], duration: 1.2 },
+      { keys: ['ArrowUp'], duration: 1.2 },
+    ],
+  },
   sprite: {
     size: 56,
     x: 0,
@@ -30,6 +41,11 @@ const gameState = {
   lastTimestamp: performance.now(),
 };
 
+if (typeof window !== 'undefined') {
+  window.__CANVAS_RUNNER_DEBUG__ = {
+    getState: () => gameState,
+  };
+}
 const keyElements = Object.fromEntries(
   Object.keys(gameState.keys).map((key) => [key, document.querySelector(`[data-key="${key}"]`)]),
 );
@@ -49,6 +65,98 @@ const handleResize = () => {
   gameState.sprite.y = clamp(gameState.sprite.y || half, half, gameState.viewportHeight - half);
 };
 
+const autopilotButton = document.querySelector('.hud__autopilot');
+const autopilotStatus = autopilotButton?.querySelector('.hud__autopilot-status');
+
+const resetDirectionalKeys = () => {
+  Object.keys(gameState.keys).forEach((key) => {
+    gameState.keys[key] = false;
+  });
+};
+
+const applyAutopilotStep = () => {
+  const { autopilot } = gameState;
+  const step = autopilot.sequence[autopilot.index];
+  resetDirectionalKeys();
+
+  if (!step) {
+    return;
+  }
+
+  step.keys.forEach((key) => {
+    if (Object.prototype.hasOwnProperty.call(gameState.keys, key)) {
+      gameState.keys[key] = true;
+    }
+  });
+};
+
+const updateAutopilotButtonUI = () => {
+  if (!autopilotButton) return;
+
+  const { enabled } = gameState.autopilot;
+  autopilotButton.setAttribute('aria-pressed', String(enabled));
+  autopilotButton.setAttribute(
+    'aria-label',
+    enabled ? 'Disable autopilot' : 'Enable autopilot',
+  );
+  autopilotButton.classList.toggle('is-active', enabled);
+
+  if (autopilotStatus) {
+    autopilotStatus.textContent = enabled ? 'On' : 'Off';
+  }
+};
+
+const setAutopilotEnabled = (enabled) => {
+  const { autopilot } = gameState;
+  if (autopilot.enabled === enabled) {
+    return;
+  }
+
+  autopilot.enabled = enabled;
+  autopilot.elapsed = 0;
+  autopilot.index = 0;
+
+  if (enabled) {
+    applyAutopilotStep();
+  } else {
+    resetDirectionalKeys();
+  }
+
+  updateAutopilotButtonUI();
+};
+
+const updateAutopilot = (delta) => {
+  const { autopilot } = gameState;
+
+  if (!autopilot.enabled) {
+    return;
+  }
+
+  if (!autopilot.sequence.length) {
+    resetDirectionalKeys();
+    return;
+  }
+
+  autopilot.elapsed += delta;
+
+  let currentStep = autopilot.sequence[autopilot.index];
+
+  while (currentStep && autopilot.elapsed >= currentStep.duration) {
+    autopilot.elapsed -= currentStep.duration;
+    autopilot.index = (autopilot.index + 1) % autopilot.sequence.length;
+    currentStep = autopilot.sequence[autopilot.index];
+  }
+
+  applyAutopilotStep();
+};
+
+const handleKeyChange = (event, isActive) => {
+  if (!Object.prototype.hasOwnProperty.call(gameState.keys, event.key)) {
+    return;
+  }
+
+  if (gameState.autopilot.enabled) {
+    setAutopilotEnabled(false);
 const updateKeyDisplay = () => {
   Object.entries(gameState.keys).forEach(([key, isActive]) => {
     const element = keyElements[key];
@@ -64,6 +172,9 @@ const handleKeyChange = (event, isActive) => {
     updateKeyDisplay();
     event.preventDefault();
   }
+
+  gameState.keys[event.key] = isActive;
+  event.preventDefault();
 };
 
 const updateSprite = (delta) => {
@@ -168,6 +279,7 @@ const gameLoop = (timestamp) => {
   const delta = (timestamp - gameState.lastTimestamp) / 1000;
   gameState.lastTimestamp = timestamp;
 
+  updateAutopilot(delta);
   updateSprite(delta);
   render();
 
@@ -193,3 +305,11 @@ window.addEventListener('resize', () => {
 
 window.addEventListener('keydown', (event) => handleKeyChange(event, true));
 window.addEventListener('keyup', (event) => handleKeyChange(event, false));
+
+if (autopilotButton) {
+  autopilotButton.addEventListener('click', () => {
+    setAutopilotEnabled(!gameState.autopilot.enabled);
+  });
+
+  updateAutopilotButtonUI();
+}
