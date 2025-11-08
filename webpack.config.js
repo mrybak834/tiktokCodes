@@ -48,8 +48,9 @@ module.exports = {
     static: {
       directory: path.join(__dirname, 'public'),
     },
+    host: '127.0.0.1',
     hot: true,
-    open: true,
+    open: false,
     port: 5173,
     historyApiFallback: true,
   },
