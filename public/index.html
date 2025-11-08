@@ -1,14 +1,19 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Three.js Website</title>
-    <link rel="stylesheet" href="styles/style.css">
-</head>
-<body>
-    <div id="app"></div>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="../src/main.js" type="module"></script>
-</body>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="Minimal 2D canvas playground with arrow-key movement." />
+    <title>Canvas Runner</title>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%23093041'/%3E%3Cpath d='M10 8h4v4h-4zm0 6h4v4h-4zm8-6h4v4h-4zm0 6h4v4h-4z' fill='%23fff'/%3E%3C/svg%3E" />
+  </head>
+  <body>
+    <main class="game-shell">
+      <canvas id="game-canvas" role="img" aria-label="2D game world"></canvas>
+      <aside class="hud" aria-live="polite">
+        <h1 class="hud__title">Canvas Runner</h1>
+        <p class="hud__hint">Use the arrow keys to move the player.</p>
+      </aside>
+    </main>
+  </body>
 </html>
