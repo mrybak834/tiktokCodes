@@ -121,6 +121,8 @@ body {
 .hud__autopilot[aria-pressed='true'] .hud__autopilot-status {
   background: rgba(15, 23, 42, 0.2);
   color: #0f172a;
+}
+
 .hud__keys {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 52px));
