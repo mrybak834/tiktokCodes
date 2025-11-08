@@ -30,6 +30,10 @@ const gameState = {
   lastTimestamp: performance.now(),
 };
 
+const keyElements = Object.fromEntries(
+  Object.keys(gameState.keys).map((key) => [key, document.querySelector(`[data-key="${key}"]`)]),
+);
+
 const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
 
 const handleResize = () => {
@@ -45,9 +49,19 @@ const handleResize = () => {
   gameState.sprite.y = clamp(gameState.sprite.y || half, half, gameState.viewportHeight - half);
 };
 
+const updateKeyDisplay = () => {
+  Object.entries(gameState.keys).forEach(([key, isActive]) => {
+    const element = keyElements[key];
+    if (!element) return;
+    element.classList.toggle('is-active', isActive);
+    element.setAttribute('aria-checked', String(isActive));
+  });
+};
+
 const handleKeyChange = (event, isActive) => {
   if (Object.prototype.hasOwnProperty.call(gameState.keys, event.key)) {
     gameState.keys[event.key] = isActive;
+    updateKeyDisplay();
     event.preventDefault();
   }
 };
@@ -164,6 +178,7 @@ const initialise = () => {
   gameState.sprite.x = gameState.viewportWidth / 2;
   gameState.sprite.y = gameState.viewportHeight / 2;
   gameState.lastTimestamp = performance.now();
+  updateKeyDisplay();
   render();
   window.requestAnimationFrame(gameLoop);
 };
